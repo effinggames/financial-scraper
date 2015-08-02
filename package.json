@@ -1,0 +1,33 @@
+{
+  "name": "financial-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --harmony -harmony_arrow_functions main.js",
+    "main": "node --harmony -harmony_arrow_functions main.js"
+  },
+  "engines": {
+    "iojs": "2.4.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/robgraeber/financial-scraper.git"
+  },
+  "author": "Rob Graeber",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robgraeber/financial-scraper/issues"
+  },
+  "homepage": "https://github.com/robgraeber/financial-scraper#readme",
+  "dependencies": {
+    "bluebird": "^2.9.34",
+    "commander": "^2.8.1",
+    "knex": "^0.8.6",
+    "pg": "^4.4.1",
+    "request-promise": "^0.4.3",
+    "winston2": "^1.0.3",
+    "xlsx": "^0.8.0"
+  }
+}
