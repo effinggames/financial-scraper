@@ -10,11 +10,11 @@ Using io.js 2.4+ and Postgres.
 ```
 git clone https://github.com/robgraeber/financial-scraper.git && cd financial-scraper
 (setup env variables)
-./main.js fetch all
+npm start
 ```
 
 Env variables:  
-`POSTGRES_CONN_STR`: Postgres connection string (required)
+`DATABASE_URL`: Postgres connection string (required)
 
 Postgres tables expected:   
 ```

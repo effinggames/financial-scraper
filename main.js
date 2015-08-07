@@ -40,7 +40,7 @@ Program
         } else {
             promise
                 .catch(err => Logger.error('Error:', err))
-                .finally(() => process.exit(1));
+                .finally(() => process.exit());
         }
     });
 

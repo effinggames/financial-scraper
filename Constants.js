@@ -3,8 +3,8 @@ const Assert = require('assert');
 
 class Constants {
     constructor() {
-        this.PostgresConnectionString = process.env.PG_CONN_STR;
-        Assert(process.env.PG_CONN_STR, 'ENV variable: PG_CONN_STR is not set!');
+        this.PostgresConnectionString = process.env.DATABASE_URL;
+        Assert(process.env.DATABASE_URL, 'ENV variable: DATABASE_URL is not set!');
     }
 }
 
