@@ -21,7 +21,8 @@ corporate_liabilites
 local_gov_liabilites
   date DATE
   value NUMERIC(10,2)
-federal_gov_liabilites- date DATE
+federal_gov_liabilites
+  date DATE
   value NUMERIC(10,2)
 household_liabilites
   date DATE
