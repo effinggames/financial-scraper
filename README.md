@@ -3,6 +3,8 @@ Financial-Scraper
 Gathers financial data and saves it to postgres.
 
 Currently gathers total domestic liabilities, total stock market cap, and historical sp500 data.
+
+Using io.js 2.4+ and Postgres.
 ### Usage:
 
 ```
