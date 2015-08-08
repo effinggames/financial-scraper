@@ -4,7 +4,8 @@ Gathers financial data and saves it to postgres.
 
 Currently gathers total domestic liabilities, total stock market cap, and historical sp500 data.
 
-Using io.js 2.4+ and Postgres.
+Using io.js 2.4+, Postgres, and db-migrate.
+
 ### Usage:
 
 ```
@@ -16,7 +17,7 @@ npm start
 Env variables:  
 `DATABASE_URL`: Postgres connection string (required)
 
-Postgres tables expected:   
+Postgres tables that will be setup automatically:   
 ```
 corporate_liabilites
   date DATE
@@ -43,8 +44,15 @@ sp_500_monthly
   date DATE
   price NUMERIC(10,2)
   dividend NUMERIC(15,12)
-  earnings NUMERIC(15,12)
-  cpi NUMERIC(12,8)
-  gs10 NUMERIC(4,2)
-  pe10 NUMERIC(4,2)
+  ...cpi, earnings, gs10, and pe10
+```
+
+Postgres views that are setup automatically: 
+```
+total_liabilities
+  date DATE
+  value NUMERIC(10,2)
+total_market_cap
+  date DATE
+  value NUMERIC(10,3)
 ```

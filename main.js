@@ -1,6 +1,5 @@
 #!/usr/bin/env node --harmony --harmony_arrow_functions
 'use strict';
-const Util2 = require('./Util2');
 const Program = require('commander');
 const Promise = require('bluebird');
 const Logger = require('winston2');

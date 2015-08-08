@@ -9,11 +9,15 @@ const CSVParser = Promise.promisify(require('csv-parse'));
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
 
 class SP500Scraper {
+    /**
+     * Fetches historical sp500 data, then truncates + saves to db
+     * @returns {Promise.<null>}
+     */
     fetch() {
         Logger.info('Fetching historical sp500 data');
         return Request.get(csvUrl).then(csvBuffer => {
             Logger.info('Received csv successfully');
-            //'pe10' cascades so only the last value is used
+            //'pe10' cascades so only the last value is parsed
             return CSVParser(csvBuffer, { columns: ['date', 'price', 'dividend', 'earnings', 'cpi', 'gs10', 'pe10', 'pe10', 'pe10', 'pe10'] })
         }).then(dataArray => {
             Logger.info('Formatting data');
