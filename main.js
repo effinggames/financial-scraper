@@ -14,7 +14,7 @@ Program.version('1.0.0');
 Program
     .command('fetch [name]')
     .description('fetch data and update the target collection')
-    .action(function(name, options) {
+    .action((name, options) => {
         name = name || 'all';
         let promise;
         switch (name) {

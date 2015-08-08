@@ -48,7 +48,7 @@ class LiabilityScraper {
             const federalGovData = SpreadsheetHelper.columnRange('F', 18, lastRow).map(i => worksheet[i].v);
 
             //matches the value data to the date, and correctly formats it for the db
-            const formatData = array => array.map((i, index) => ({ date: dateData[index], value: i }));
+            const formatData = array => array.map((i, index) => ({ date: dateData[index], value: i || null }));
 
             //truncates the tables then saves all the data to db
             return Promise.all([

@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./main.js fetch all"
+    "start": "db-migrate up && ./main.js fetch all"
   },
   "engines": {
     "iojs": "2.4.x"
@@ -24,6 +24,7 @@
     "bluebird": "^2.9.34",
     "commander": "^2.8.1",
     "csv-parse": "^0.1.4",
+    "db-migrate": "^0.9.18",
     "knex": "^0.8.6",
     "pg": "^4.4.1",
     "request-promise": "^0.4.3",
