@@ -42,9 +42,9 @@ financial_market_cap
   value NUMERIC(10,3)
 sp_500_monthly
   date DATE
-  price NUMERIC(10,2)
+  close NUMERIC(10,2)
   dividend NUMERIC(15,12)
-  ...cpi, earnings, gs10, and pe10
+  ...cpi, earnings, gs10, pe10, adjusted_close
 ```
 
 Postgres views that are setup automatically: 
@@ -55,4 +55,10 @@ total_liabilities
 total_market_cap
   date DATE
   value NUMERIC(10,3)
+ stock_asset_allocation
+   date DATE
+   percentage REAL
+ sp_500_10_year_return
+   date DATE
+   percentage REAL
 ```

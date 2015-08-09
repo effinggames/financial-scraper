@@ -18,14 +18,23 @@ class SP500Scraper {
         return Request.get(csvUrl).then(csvBuffer => {
             Logger.info('Received csv successfully');
             //'pe10' cascades so only the last value is parsed
-            return CSVParser(csvBuffer, { columns: ['date', 'price', 'dividend', 'earnings', 'cpi', 'gs10', 'pe10', 'pe10', 'pe10', 'pe10'] })
+            return CSVParser(csvBuffer, { auto_parse: true, columns: ['date', 'close', 'dividend', 'earnings', 'cpi', 'gs10', 'pe10', 'pe10', 'pe10', 'pe10'] })
         }).then(dataArray => {
             Logger.info('Formatting data');
             dataArray.shift(); //removes csv headers
-            dataArray.forEach(obj => {
+            dataArray.forEach((obj, index) => {
                 obj.dividend /= 12; //convert annualized dividends to monthly
                 Object.keys(obj).map(key => obj[key] = obj[key] || null); //convert '' => null
+
+                if (index === 0 || !dataArray[index-1].dividend) {
+                    obj.adjusted_close = obj.close;
+                } else {
+                    const prevObj = dataArray[index - 1];
+                    obj.adjusted_close = prevObj.adjusted_close + prevObj.adjusted_close * (obj.close - prevObj.close - prevObj.dividend) / prevObj.close;
+                }
             });
+            dataArray.reverse();
+
             return dataArray;
         }).then(dataArray => {
             Logger.info('Truncating old sp500 data');

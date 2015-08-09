@@ -41,17 +41,18 @@ exports.up = function(db, done) {
                 type: 'date',
                 primaryKey: true
             },
-            price: 'numeric(10,2)',
+            close: 'numeric(10,2)',
             dividend: 'numeric(15,12)',
             earnings: 'numeric(15,12)',
             cpi: 'numeric(12,8)',
             gs10: 'numeric(4,2)',
-            pe10: 'numeric(4,2)'
+            pe10: 'numeric(4,2)',
+            adjusted_close: 'double precision'
         });
     }).then(function() {
         var sqlCmd = `
             CREATE VIEW total_market_cap AS
-            SELECT n.date, n.value + f.value AS value
+            SELECT n.date, (n.value + f.value)::NUMERIC(10,2) AS value
             FROM nonfinancial_market_cap n, financial_market_cap f
             WHERE n.date = f.date
         `;
@@ -59,11 +60,26 @@ exports.up = function(db, done) {
     }).then(function() {
         var sqlCmd = `
             CREATE VIEW total_liabilities AS
-            SELECT c.date, c.value + f.value + h.value + l.value AS value
+            SELECT c.date, (c.value + f.value + h.value + l.value)::NUMERIC(10,3) AS value
             FROM corporate_liabilities c
-                LEFT JOIN federal_gov_liabilities f ON (c.date = f.date)
-                LEFT JOIN household_liabilities h ON (c.date = h.date)
-                LEFT JOIN local_gov_liabilities l ON (c.date = l.date);
+              LEFT JOIN federal_gov_liabilities f ON (c.date = f.date)
+              LEFT JOIN household_liabilities h ON (c.date = h.date)
+              LEFT JOIN local_gov_liabilities l ON (c.date = l.date)
+        `;
+        return db.runSqlAsync(sqlCmd)
+    }).then(function() {
+        var sqlCmd = `
+            CREATE VIEW stock_asset_allocation AS
+            SELECT l.date, (m.value / (m.value + l.value))::REAL AS percentage
+            FROM total_liabilities l
+                LEFT JOIN total_market_cap m ON (l.date = m.date)
+        `;
+        return db.runSqlAsync(sqlCmd)
+    }).then(function() {
+        var sqlCmd = `
+            CREATE VIEW sp_500_10_year_return AS
+            SELECT date, (((lead(adjusted_close, 120) OVER (ORDER BY date ASC) / adjusted_close) ^ 0.1) - 1)::REAL AS percentage
+            FROM sp_500_monthly
         `;
         return db.runSqlAsync(sqlCmd)
     }).then(function() {
@@ -74,8 +90,12 @@ exports.up = function(db, done) {
 exports.down = function(db, done) {
     Promise.promisifyAll(db);
 
-    db.runSqlAsync('DROP VIEW total_liabilities;').then(function() {
-        return db.runSqlAsync('DROP VIEW total_market_cap;');
+    db.runSqlAsync('DROP VIEW sp_500_10_year_return').then(function() {
+        return db.runSqlAsync('DROP VIEW stock_asset_allocation');
+    }).then(function() {
+        return db.runSqlAsync('DROP VIEW total_liabilities');
+    }).then(function() {
+        return db.runSqlAsync('DROP VIEW total_market_cap');
     }).then(function() {
         return db.dropTableAsync('corporate_liabilities');
     }).then(function() {
