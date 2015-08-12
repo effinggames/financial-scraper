@@ -55,10 +55,4 @@ total_liabilities
 total_market_cap
   date DATE
   value NUMERIC(10,3)
- stock_asset_allocation
-   date DATE
-   percentage REAL
- sp_500_10_year_return
-   date DATE
-   percentage REAL
 ```
