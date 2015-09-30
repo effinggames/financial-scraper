@@ -5,7 +5,7 @@
   "main": "Main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "db-migrate up && ./Main.js fetch all"
+    "start": "db-migrate up && node --harmony --harmony_arrow_functions Main.js fetch all"
   },
   "engines": {
     "iojs": "2.4.x"

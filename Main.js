@@ -1,4 +1,3 @@
-#!/usr/bin/env node --harmony --harmony_arrow_functions
 'use strict';
 const Program = require('commander');
 const Promise = require('bluebird');
