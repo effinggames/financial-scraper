@@ -7,7 +7,6 @@ const LiabilityScraper = require('./scrapers/LiabilityScraper');
 const MarketCapScraper = require('./scrapers/MarketCapScraper');
 const SP500Scraper = require('./scrapers/SP500Scraper');
 
-
 Program.version('1.0.0');
 
 Program
