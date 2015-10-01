@@ -36,9 +36,13 @@ Program
             process.exit(1);
         } else {
             promise
-                .catch(err => Logger.error('Error:', err))
+                .catch(err => {
+                    Logger.error('Error:', err);
+                    process.exit(1);
+                })
                 .finally(() => process.exit());
         }
     });
+process.exit(1);
 
 Program.parse(process.argv);
