@@ -43,6 +43,5 @@ Program
                 .finally(() => process.exit());
         }
     });
-process.exit(1);
 
 Program.parse(process.argv);
