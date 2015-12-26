@@ -8,7 +8,7 @@
     "start": "db-migrate up && node --harmony --harmony_arrow_functions Main.js fetch all"
   },
   "engines": {
-    "iojs": "2.4.x"
+    "node": "4.2.x"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
     "bluebird": "^2.9.34",
     "commander": "^2.8.1",
     "csv-parse": "^0.1.4",
-    "db-migrate": "^0.9.19",
+    "db-migrate": "^0.9.23",
     "knex": "^0.8.6",
     "pg": "^4.4.1",
     "request-promise": "^0.4.3",
