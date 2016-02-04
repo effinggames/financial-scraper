@@ -10,6 +10,7 @@ Using io.js 2.4+, Postgres, and db-migrate.
 
 ```
 git clone https://github.com/robgraeber/financial-scraper.git && cd financial-scraper
+npm install
 (setup env variables)
 npm start
 ```
