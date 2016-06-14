@@ -8,13 +8,6 @@ exports.up = function(db, done) {
     Promise.promisifyAll(db);
     return db.runSqlAsync('CREATE SCHEMA analysis').then(function() {
         return db.runSqlAsync(`
-            CREATE VIEW analysis.stock_asset_allocation AS
-            SELECT l.date, (m.value / (m.value + l.value))::REAL AS percentage
-            FROM total_liabilities l
-                LEFT JOIN total_market_cap m ON (l.date = m.date)
-        `);
-    }).then(function() {
-        return db.runSqlAsync(`
             CREATE VIEW analysis.sp_500_annualized_return AS
             SELECT date,
             (((lead(adjusted_close, 12) OVER (ORDER BY date ASC) / adjusted_close) ^ 1) - 1)::REAL AS return_1,
@@ -37,7 +30,7 @@ exports.up = function(db, done) {
               corr(a.return_15, b.percentage) AS return_15,
               corr(a.return_20, b.percentage) AS return_20
             FROM analysis.sp_500_annualized_return a
-            INNER JOIN analysis.stock_asset_allocation b
+            INNER JOIN stock_asset_allocation b
             ON (date_trunc('month', a.date + INTERVAL '1 day') = date_trunc('month', b.date))
             AND a.return_1 > 0
             AND b.percentage > 0

@@ -6,35 +6,13 @@ const Promise = require('bluebird');
  */
 exports.up = function(db, done) {
     Promise.promisifyAll(db);
-    const liabilityFields = {
-        date: {
-            type: 'date',
-            primaryKey: true
-        },
-        value: 'numeric(10,2)'
-    };
 
-    const marketCapFields = {
+    db.createTableAsync('stock_asset_allocation', {
         date: {
             type: 'date',
             primaryKey: true
         },
-        value: {
-            type: 'numeric(10,3)'
-        }
-    };
-    db.createTableAsync('corporate_liabilities', liabilityFields).then(function() {
-        return db.createTableAsync('federal_gov_liabilities', liabilityFields);
-    }).then(function() {
-        return db.createTableAsync('local_gov_liabilities', liabilityFields);
-    }).then(function() {
-        return db.createTableAsync('household_liabilities', liabilityFields);
-    }).then(function() {
-        return db.createTableAsync('world_liabilities', liabilityFields);
-    }).then(function() {
-        return db.createTableAsync('financial_market_cap', marketCapFields);
-    }).then(function() {
-        return db.createTableAsync('nonfinancial_market_cap', marketCapFields);
+        percentage: 'numeric(6,5)'
     }).then(function() {
         return db.createTableAsync('sp_500_monthly', {
             date: {
@@ -50,22 +28,6 @@ exports.up = function(db, done) {
             adjusted_close: 'double precision'
         });
     }).then(function() {
-        return db.runSqlAsync(`
-            CREATE VIEW total_market_cap AS
-            SELECT n.date, (n.value + f.value)::NUMERIC(10,2) AS value
-            FROM nonfinancial_market_cap n, financial_market_cap f
-            WHERE n.date = f.date
-        `);
-    }).then(function() {
-        return db.runSqlAsync(`
-            CREATE VIEW total_liabilities AS
-            SELECT c.date, (c.value + f.value + h.value + l.value)::NUMERIC(10,3) AS value
-            FROM corporate_liabilities c
-              LEFT JOIN federal_gov_liabilities f ON (c.date = f.date)
-              LEFT JOIN household_liabilities h ON (c.date = h.date)
-              LEFT JOIN local_gov_liabilities l ON (c.date = l.date)
-        `);
-    }).then(function() {
         done();
     })
 };
@@ -73,25 +35,10 @@ exports.up = function(db, done) {
 exports.down = function(db, done) {
     Promise.promisifyAll(db);
 
-    db.runSqlAsync('DROP VIEW total_liabilities').then(function() {
-        return db.runSqlAsync('DROP VIEW total_market_cap');
-    }).then(function() {
-        return db.dropTableAsync('corporate_liabilities');
-    }).then(function() {
-        return db.dropTableAsync('federal_gov_liabilities');
-    }).then(function() {
-        return db.dropTableAsync('local_gov_liabilities');
-    }).then(function() {
-        return db.dropTableAsync('household_liabilities');
-    }).then(function() {
-        return db.dropTableAsync('world_liabilities');
-    }).then(function() {
-        return db.dropTableAsync('financial_market_cap');
-    }).then(function() {
-        return db.dropTableAsync('nonfinancial_market_cap');
-    }).then(function() {
-        return db.dropTableAsync('sp_500_monthly');
-    }).then(function() {
+    Promise.all([
+        db.dropTableAsync('stock_asset_allocation'),
+        db.dropTableAsync('sp_500_monthly')
+    ]).then(function() {
         done();
-    })
+    });
 };
