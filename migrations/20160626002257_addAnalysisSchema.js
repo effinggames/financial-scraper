@@ -1,13 +1,7 @@
-'use strict';
-const Promise = require('bluebird');
 
-/**
- * Migration script that sets up the initial tables + views (using db-migrate)
- */
-exports.up = function(db, done) {
-    Promise.promisifyAll(db);
-    return db.runSqlAsync('CREATE SCHEMA analysis').then(function() {
-        return db.runSqlAsync(`
+exports.up = function(Knex, Promise) {
+    return Knex.schema.raw('CREATE SCHEMA analysis').then(function() {
+        return Knex.schema.raw(`
             CREATE VIEW analysis.sp_500_annualized_return AS
             SELECT date,
             (((lead(adjusted_close, 12) OVER (ORDER BY date ASC) / adjusted_close) ^ 1) - 1)::REAL AS return_1,
@@ -17,11 +11,11 @@ exports.up = function(db, done) {
             (((lead(adjusted_close, 120) OVER (ORDER BY date ASC) / adjusted_close) ^ 0.1) - 1)::REAL AS return_10,
             (((lead(adjusted_close, 180) OVER (ORDER BY date ASC) / adjusted_close) ^ 0.075) - 1)::REAL AS return_15,
             (((lead(adjusted_close, 240) OVER (ORDER BY date ASC) / adjusted_close) ^ 0.05) - 1)::REAL AS return_20
-            FROM sp_500_monthly
+            FROM usa.sp_500_monthly
         `);
     }).then(function() {
-        return db.runSqlAsync(`
-            CREATE VIEW analysis.stock_allocation_vs_return_corr AS
+        return Knex.schema.raw(`
+            CREATE VIEW analysis.usa_stock_allocation_vs_return_corr AS
             SELECT corr(a.return_1, b.percentage) AS return_1,
               corr(a.return_3, b.percentage) AS return_3,
               corr(a.return_5, b.percentage) AS return_5,
@@ -30,19 +24,14 @@ exports.up = function(db, done) {
               corr(a.return_15, b.percentage) AS return_15,
               corr(a.return_20, b.percentage) AS return_20
             FROM analysis.sp_500_annualized_return a
-            INNER JOIN stock_asset_allocation b
+            INNER JOIN usa.stock_asset_allocation b
             ON (date_trunc('month', a.date + INTERVAL '1 day') = date_trunc('month', b.date))
             AND a.return_1 > 0
             AND b.percentage > 0
         `);
-    }).then(function() {
-        done();
-    });
+    })
 };
 
-exports.down = function(db, done) {
-    Promise.promisifyAll(db);
-    db.runSqlAsync('DROP SCHEMA analysis CASCADE').then(function() {
-        done();
-    });
+exports.down = function(Knex, Promise) {
+    return Knex.schema.raw('DROP SCHEMA analysis CASCADE');
 };

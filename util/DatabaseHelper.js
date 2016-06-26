@@ -1,5 +1,5 @@
 'use strict';
-const Constants = require('../Constants');
+const Constants = require('./../Constants');
 const Knex = require('knex');
 
 /**

@@ -1,9 +1,8 @@
 'use strict';
-const Assert = require('assert');
 const Logger = require('winston2');
 const Promise = require('bluebird');
 const Request = require('request-promise');
-const Knex = require('./DatabaseHelper').knex;
+const Knex = require('../util/DatabaseHelper').knex;
 const CSVParser = Promise.promisify(require('csv-parse'));
 
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
@@ -38,10 +37,10 @@ class SP500Scraper {
             return dataArray;
         }).then(dataArray => {
             Logger.info('Truncating old sp500 data');
-            return Promise.join(dataArray, Knex('sp_500_monthly').truncate());
+            return Promise.join(dataArray, Knex('usa.sp_500_monthly').truncate());
         }).spread(dataArray => {
             Logger.info(`Inserting ${dataArray.length} rows`);
-            return Promise.join(dataArray, Knex('sp_500_monthly').insert(dataArray));
+            return Promise.join(dataArray, Knex('usa.sp_500_monthly').insert(dataArray));
         }).spread(dataArray => {
             Logger.info('All sp500 data should be saved');
             Logger.info(`Saved ${dataArray.length} rows`);

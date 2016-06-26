@@ -5,7 +5,7 @@
   "main": "Main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "db-migrate up && node Main.js fetch all"
+    "start": "knex migrate:latest && node Main.js fetch all"
   },
   "engines": {
     "node": "4.2.x"
@@ -25,7 +25,8 @@
     "commander": "^2.8.1",
     "csv-parse": "^0.1.4",
     "db-migrate": "^0.9.23",
-    "knex": "^0.8.6",
+    "knex": "^0.11.7np",
+    "moment": "^2.13.0",
     "pg": "^4.4.1",
     "request-promise": "^0.4.3",
     "winston2": "^1.0.3",
