@@ -4,6 +4,8 @@ const Promise = require('bluebird');
 const Logger = require('winston2');
 const USStockAllocationScraper = require('./scrapers/USStockAllocationScraper');
 const EuropeLiabilityScraper = require('./scrapers/EuropeLiabilityScraper');
+const EuropeMarketScraper = require('./scrapers/EuropeMarketScraper');
+const EAFEScraper = require('./scrapers/EAFEScraper');
 const SP500Scraper = require('./scrapers/SP500Scraper');
 
 Program.version('1.0.0');
@@ -15,6 +17,12 @@ Program
         name = name || 'all';
         let promise;
         switch (name) {
+            case 'eafe':
+                promise = EAFEScraper.fetch();
+                break;
+            case 'europeMarket':
+                promise = EuropeMarketScraper.fetch();
+                break;
             case 'europeLiabilities':
                 promise = EuropeLiabilityScraper.fetch();
                 break;
@@ -25,9 +33,16 @@ Program
                 promise = SP500Scraper.fetch();
                 break;
             case 'all':
-                promise = Promise.reduce([USStockAllocationScraper.fetch, SP500Scraper.fetch, EuropeLiabilityScraper.fetch], (total, promise) => {
-                    return promise();
-                }, 0);
+                var promiseFuncs = [
+                    USStockAllocationScraper.fetch,
+                    SP500Scraper.fetch,
+                    EAFEScraper.fetch,
+                    EuropeLiabilityScraper.fetch,
+                    EuropeMarketScraper.fetch
+                ];
+                promise = Promise.each(promiseFuncs, promiseFunc => {
+                    return promiseFunc();
+                });
                 break;
             default:
                 Logger.info('Target collection not found!');
@@ -35,12 +50,12 @@ Program
         if (!promise) {
             process.exit(1);
         } else {
-            promise
-                .catch(err => {
-                    Logger.error('Error:', err);
-                    process.exit(1);
-                })
-                .finally(() => process.exit());
+            promise.catch(function(err) {
+                Logger.error('Error:', err);
+                process.exit(1);
+            }).finally(function() {
+                process.exit();
+            });
         }
     });
 

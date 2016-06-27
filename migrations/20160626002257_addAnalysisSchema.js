@@ -29,7 +29,7 @@ exports.up = function(Knex, Promise) {
             AND a.return_1 > 0
             AND b.percentage > 0
         `);
-    })
+    });
 };
 
 exports.down = function(Knex, Promise) {

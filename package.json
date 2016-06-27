@@ -21,15 +21,16 @@
   },
   "homepage": "https://github.com/robgraeber/financial-scraper#readme",
   "dependencies": {
-    "bluebird": "^2.9.34",
+    "bluebird": "^3.4.1",
     "commander": "^2.8.1",
     "csv-parse": "^0.1.4",
     "db-migrate": "^0.9.23",
     "knex": "^0.11.7np",
     "moment": "^2.13.0",
+    "moment-timezone": "^0.5.4",
     "pg": "^4.4.1",
     "request-promise": "^0.4.3",
     "winston2": "^1.0.3",
-    "xlsx": "^0.8.0"
+    "xlsx": "https://github.com/robgraeber/js-xlsx"
   }
 }
