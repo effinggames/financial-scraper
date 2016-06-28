@@ -16,6 +16,11 @@ exports.up = function(Knex, Promise) {
             table.decimal('value', 9, 3);
         });
     }).then(function() {
+        return Knex.schema.withSchema('europe').createTable('eafe_daily', function (table) {
+            table.date('date').primary();
+            table.decimal('value', 9, 3);
+        });
+    }).then(function() {
         return Knex.schema.raw(`
             CREATE VIEW europe.stock_asset_allocation AS
               SELECT a.date, (b.value::FLOAT / (b.value::FLOAT + a.value::FLOAT)) AS percentage

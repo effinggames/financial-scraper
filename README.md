@@ -18,5 +18,5 @@ npm start
 Env variables:  
 `DATABASE_URL`: Postgres connection string (required)
 
-Postgres tables that will be setup automatically by:
+Postgres tables will be setup automatically by:
 `knex migrate:latest`

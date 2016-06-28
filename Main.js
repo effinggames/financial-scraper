@@ -20,6 +20,9 @@ Program
             case 'eafe':
                 promise = EAFEScraper.fetch();
                 break;
+            case 'eafeDaily':
+                promise = EAFEScraper.fetchDaily();
+                break;
             case 'europeMarket':
                 promise = EuropeMarketScraper.fetch();
                 break;
@@ -37,6 +40,7 @@ Program
                     USStockAllocationScraper.fetch,
                     SP500Scraper.fetch,
                     EAFEScraper.fetch,
+                    EAFEScraper.fetchDaily,
                     EuropeLiabilityScraper.fetch,
                     EuropeMarketScraper.fetch
                 ];
