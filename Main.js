@@ -35,10 +35,23 @@ Program
             case 'sp500':
                 promise = SP500Scraper.fetch();
                 break;
+            case 'sp500Daily':
+                promise = SP500Scraper.fetchDaily();
+                break;
+            case 'daily':
+                var promiseFuncs = [
+                    SP500Scraper.fetchDaily,
+                    EAFEScraper.fetchDaily
+                ];
+                promise = Promise.each(promiseFuncs, promiseFunc => {
+                    return promiseFunc();
+                });
+                break;
             case 'all':
                 var promiseFuncs = [
                     USStockAllocationScraper.fetch,
                     SP500Scraper.fetch,
+                    SP500Scraper.fetchDaily,
                     EAFEScraper.fetch,
                     EAFEScraper.fetchDaily,
                     EuropeLiabilityScraper.fetch,

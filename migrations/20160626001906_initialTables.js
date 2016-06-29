@@ -4,7 +4,7 @@ exports.up = function(Knex, Promise) {
         return Knex.schema.withSchema('usa').createTable('stock_asset_allocation', function (table) {
             table.date('date').primary();
             table.decimal('percentage', 6, 5);
-        })
+        });
     }).then(function() {
         return Knex.schema.withSchema('usa').createTable('sp_500_monthly', function (table) {
             table.date('date').primary();
@@ -15,6 +15,11 @@ exports.up = function(Knex, Promise) {
             table.decimal('gs10', 4, 2);
             table.decimal('pe10', 4, 2);
             table.decimal('adjusted_close', 10, 2);
+        });
+    }).then(function() {
+        return Knex.schema.withSchema('usa').createTable('sp_500_daily', function (table) {
+            table.date('date').primary();
+            table.decimal('value', 9, 3);
         });
     })
 };

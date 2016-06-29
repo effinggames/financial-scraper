@@ -8,7 +8,7 @@ const Knex = require('../util/DatabaseHelper').knex;
 const SpreadsheetHelper = require('../util/SpreadsheetHelper');
 
 const EAFEMonthlySpreadsheetURL = 'https://www.msci.com/webapp/indexperf/charts?indices=108,C,36&startDate=31%20Dec,%201969&endDate=24%20Jun,%202099&priceLevel=40&currency=15&frequency=D&scope=R&format=XLS&baseValue=false&site=gimi';
-const EAFEDailySpreadsheetURL = `https://www.msci.com/webapp/indexperf/charts?indices=108,C,36&startDate=27%20Jun,%20${new Date().getFullYear() - 1}&endDate=27%20Jun,%202099&priceLevel=40&currency=15&frequency=D&scope=R&format=XLS&baseValue=false&site=gimi`;
+const EAFEDailySpreadsheetURL = `https://www.msci.com/webapp/indexperf/charts?indices=108,C,36&startDate=27%20Jun,%20${new Date().getFullYear() - 2}&endDate=27%20Jun,%202099&priceLevel=40&currency=15&frequency=D&scope=R&format=XLS&baseValue=false&site=gimi`;
 
 const fetchAndInsertSpreadsheet = function(spreadsheetUrl, tableName) {
     return Request.get(spreadsheetUrl, { encoding: null }).then(xlsBuffer => {
