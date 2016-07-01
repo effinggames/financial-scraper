@@ -7,6 +7,8 @@ const EuropeLiabilityScraper = require('./scrapers/EuropeLiabilityScraper');
 const EuropeMarketScraper = require('./scrapers/EuropeMarketScraper');
 const EAFEScraper = require('./scrapers/EAFEScraper');
 const SP500Scraper = require('./scrapers/SP500Scraper');
+const UnemploymentScraper = require('./scrapers/UnemploymentScraper');
+const RecessionScraper = require('./scrapers/RecessionScraper');
 
 Program.version('1.0.0');
 
@@ -38,6 +40,12 @@ Program
             case 'sp500Daily':
                 promise = SP500Scraper.fetchDaily();
                 break;
+            case 'unemployment':
+                promise = UnemploymentScraper.fetch();
+                break;
+            case 'recessions':
+                promise = RecessionScraper.fetch();
+                break;
             case 'daily':
                 var promiseFuncs = [
                     SP500Scraper.fetchDaily,
@@ -55,7 +63,9 @@ Program
                     EAFEScraper.fetch,
                     EAFEScraper.fetchDaily,
                     EuropeLiabilityScraper.fetch,
-                    EuropeMarketScraper.fetch
+                    EuropeMarketScraper.fetch,
+                    UnemploymentScraper.fetch,
+                    RecessionScraper.fetch
                 ];
                 promise = Promise.each(promiseFuncs, promiseFunc => {
                     return promiseFunc();
