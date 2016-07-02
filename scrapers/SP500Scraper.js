@@ -6,7 +6,7 @@ const Knex = require('../util/DatabaseHelper').knex;
 const CSVParser = Promise.promisify(require('csv-parse'));
 
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
-const dailyCsvUrl = `http://real-chart.finance.yahoo.com/table.csv?s=%5ESP500TR&a=00&b=4&c=${new Date().getFullYear() - 2}&d=05&e=29&f=2016&g=d&ignore=.csv`;
+const dailyCsvUrl = `http://real-chart.finance.yahoo.com/table.csv?s=%5ESP500TR&a=00&b=4&c=${new Date().getFullYear() - 2}&d=05&e=29&f=2099&g=d&ignore=.csv`;
 
 class SP500Scraper {
     /**
