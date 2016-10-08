@@ -62,10 +62,10 @@ Program
                     SP500Scraper.fetchDaily,
                     EAFEScraper.fetch,
                     EAFEScraper.fetchDaily,
-                    EuropeLiabilityScraper.fetch,
-                    EuropeMarketScraper.fetch,
                     UnemploymentScraper.fetch,
-                    RecessionScraper.fetch
+                    RecessionScraper.fetch,
+                    EuropeLiabilityScraper.fetch,
+                    EuropeMarketScraper.fetch
                 ];
                 promise = Promise.each(promiseFuncs, promiseFunc => {
                     return promiseFunc();

@@ -7,7 +7,7 @@ const Knex = require('../util/DatabaseHelper').knex;
 const SpreadsheetHelper = require('../util/SpreadsheetHelper');
 const CSVParser = Promise.promisify(require('csv-parse'));
 
-const csvUrl = 'http://sdw.ecb.europa.eu/export.do?node=bbn171&SEC_ISSUING_SECTOR=1000&DATASET=0&exportType=xls&SERIES_KEY=130.SEC.M.I8.1000.F51100.M.1.Z01.E.Z';
+const csvUrl = 'http://sdw.ecb.europa.eu/quickviewexport.do?SERIES_KEY=130.SEC.M.I8.1000.F51100.M.1.Z01.E.Z&type=csv';
 
 class EuropeMarketScraper {
     /**
@@ -24,11 +24,7 @@ class EuropeMarketScraper {
             Logger.info('Formatting data');
             dataArray = dataArray.slice(5);
             dataArray = dataArray.map(obj => {
-                Object.keys(obj).forEach(function(key) {
-                    if (key !== 'date') {
-                        obj[key] = parseFloat(obj[key]);
-                    }
-                });
+                obj.value = parseFloat(obj.value);
                 const date = Moment(new Date(obj.date)).tz('GMT');
                 return {
                     date: date.format('YYYY-MM-DD'),

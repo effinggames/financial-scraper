@@ -7,7 +7,7 @@ const Knex = require('../util/DatabaseHelper').knex;
 const SpreadsheetHelper = require('../util/SpreadsheetHelper');
 const CSVParser = Promise.promisify(require('csv-parse'));
 
-const csvUrl = 'http://sdw.ecb.europa.eu/export.do?INSTR_ASSET=F&node=bbn157&ACCOUNTING_ENTRY=L&STO=LE&DATASET=0&exportType=xls&SERIES_KEY=332.QSA.Q.N.I8.W0.S11.S1.N.L.LE.F._Z._Z.XDC._T.S.V.N._T&SERIES_KEY=332.QSA.Q.N.I8.W0.S1M.S1.N.L.LE.F._Z._Z.XDC._T.S.V.N._T&SERIES_KEY=332.QSA.Q.N.I8.W0.S12Q.S1.N.L.LE.F._Z._Z.XDC._T.S.V.N._T&SERIES_KEY=332.QSA.Q.N.I8.W0.S13.S1.N.L.LE.F._Z._Z.XDC._T.S.V.N._T';
+const csvUrl = 'http://sdw.ecb.europa.eu/quickviewexport.do?SERIES_KEY=332.QSA.Q.N.I8.W0.S11.S1.N.L.LE.F._Z._Z.XDC._T.S.V.N._T&type=csv';
 
 class EuropeLiabilityScraper {
     /**
@@ -19,17 +19,13 @@ class EuropeLiabilityScraper {
         return Request.get(csvUrl).then(csvBuffer => {
             Logger.info('Received csv successfully');
             //'pe10' cascades so only the last value is parsed
-            return CSVParser(csvBuffer, { auto_parse: true, columns: ['date', 'nonFinancialCorporations', 'insuranceCorporations', 'government', 'households'] })
+            return CSVParser(csvBuffer, { auto_parse: true, columns: ['date', 'value'] })
         }).then(dataArray => {
             Logger.info('Formatting data');
             dataArray = dataArray.slice(5);
             dataArray = dataArray.map(obj => {
-                Object.keys(obj).forEach(function(key) {
-                    if (key !== 'date') {
-                        obj[key] = parseFloat(obj[key]);
-                    }
-                });
-                const total = (obj.nonFinancialCorporations + obj.insuranceCorporations + obj.government + obj.households) * 1000000;
+                obj.value = parseFloat(obj.value);
+                const total = obj.value * 1000000;
                 const yearStr = obj.date.slice(0,4);
                 const quarterStr = obj.date.slice(5);
                 const date = Moment(new Date(yearStr)).tz('GMT');
