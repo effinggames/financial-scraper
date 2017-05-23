@@ -1,12 +1,22 @@
 'use strict';
 const Logger = require('winston2');
 const Promise = require('bluebird');
-const Request = require('request-promise');
+const Constants = require('../Constants');
 const Knex = require('../util/DatabaseHelper').knex;
 const CSVParser = Promise.promisify(require('csv-parse'));
+const RequestLib = require('request-promise');
+
+const Request = RequestLib.defaults({
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
+        'Cookie': Constants.yahooCookie
+    },
+    followAllRedirects: true,
+    jar: true
+});
 
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
-const dailyCsvUrl = `http://real-chart.finance.yahoo.com/table.csv?s=%5ESP500TR&a=00&b=4&c=${new Date().getFullYear() - 2}&d=05&e=29&f=2099&g=d&ignore=.csv`;
+const dailyCsvUrl = `https://query1.finance.yahoo.com/v7/finance/download/%5ESP500TR?period1=${Math.floor(new Date().getTime() / 1000) - 31557600}&period2=2500000000&interval=1d&events=history&crumb=${Constants.yahooCrumb}`;
 
 class SP500Scraper {
     /**

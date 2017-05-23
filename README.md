@@ -1,10 +1,10 @@
 Financial-Scraper
 =================
-Gathers financial data and saves it to postgres.
+Gathers financial data and saves it to postgres.   
 
-Currently gathers total domestic liabilities, total stock market cap, and historical sp500 data.
+Currently gathers total domestic liabilities, total stock market cap, and historical sp500 data.   
 
-Using Node.js 4.2+, Postgres, and Knex.
+Using Node.js 4.2+, Postgres, and Knex.   
 
 ### Usage:
 
@@ -15,8 +15,10 @@ npm install
 npm start
 ```
 
-Env variables:  
-`DATABASE_URL`: Postgres connection string (required)
+Env variables:   
+`DATABASE_URL`: Postgres connection string (required)   
+`YAHOO_CRUMB`: Yahoo crumb (required)   
+`YAHOO_COOKIE`: Yahoo cookie (required)   
 
-Postgres tables will be setup automatically by:
-`knex migrate:latest`
+Postgres tables will be setup automatically by:   
+`knex migrate:latest`   

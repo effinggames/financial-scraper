@@ -78,7 +78,7 @@ Program
             process.exit(1);
         } else {
             promise.catch(function(err) {
-                Logger.error('Error:', err);
+                Logger.error(err);
                 process.exit(1);
             }).finally(function() {
                 process.exit();
