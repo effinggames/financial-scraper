@@ -48,8 +48,8 @@ Program
                 break;
             case 'daily':
                 var promiseFuncs = [
-                    SP500Scraper.fetchDaily,
-                    EAFEScraper.fetchDaily
+                    EAFEScraper.fetchDaily,
+                    SP500Scraper.fetchDaily
                 ];
                 promise = Promise.each(promiseFuncs, promiseFunc => {
                     return promiseFunc();
@@ -58,14 +58,14 @@ Program
             case 'all':
                 var promiseFuncs = [
                     USStockAllocationScraper.fetch,
-                    SP500Scraper.fetch,
-                    SP500Scraper.fetchDaily,
-                    EAFEScraper.fetch,
-                    EAFEScraper.fetchDaily,
                     UnemploymentScraper.fetch,
                     RecessionScraper.fetch,
                     EuropeLiabilityScraper.fetch,
-                    EuropeMarketScraper.fetch
+                    EuropeMarketScraper.fetch,
+                    EAFEScraper.fetch,
+                    EAFEScraper.fetchDaily,
+                    SP500Scraper.fetch,
+                    SP500Scraper.fetchDaily,
                 ];
                 promise = Promise.each(promiseFuncs, promiseFunc => {
                     return promiseFunc();
