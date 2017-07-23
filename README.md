@@ -17,8 +17,6 @@ npm start
 
 Env variables:   
 `DATABASE_URL`: Postgres connection string (required)   
-`YAHOO_CRUMB`: Yahoo crumb (required)   
-`YAHOO_COOKIE`: Yahoo cookie (required)   
 
 Postgres tables will be setup automatically by:   
 `knex migrate:latest`   
