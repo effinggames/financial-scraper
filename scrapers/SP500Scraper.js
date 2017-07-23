@@ -64,7 +64,7 @@ class SP500Scraper {
         return Request.get(yahooUrl).then(function (html) {
             const crumbRegexp = /"CrumbStore":{"crumb":"(.+?)"}/;
             const matches = html.match(crumbRegexp);
-            const crumb = matches[1];
+            const crumb = matches[1].replace('\\u002F','/');
             Assert(crumb, 'Yahoo crumb not found!');
 
             return Request.get(dailyCsvUrl + crumb).then(csvBuffer => {
