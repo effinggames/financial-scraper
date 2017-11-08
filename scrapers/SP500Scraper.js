@@ -16,26 +16,27 @@ const Request = RequestLib.defaults({
 });
 
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
-const yahooUrl = 'https://finance.yahoo.com/quote/%5ESP500TR/history?p=%5ESP500TR'
+const yahooUrl = 'https://finance.yahoo.com/quote/%5ESP500TR/history?p=%5ESP500TR';
 const dailyCsvUrl = `https://query1.finance.yahoo.com/v7/finance/download/%5ESP500TR?period1=${Math.floor(new Date().getTime() / 1000) - 31557600}&period2=2500000000&interval=1d&events=history&crumb=`;
 
 class SP500Scraper {
     /**
-     * Fetches historical sp500 data, then truncates + saves to db
+     * Fetches historical sp500 data, then truncates + saves to db.
      * @returns {Promise.<null>}
      */
     fetch() {
         Logger.info('Fetching sp500 index data (monthly)');
         return Request.get(csvUrl).then(csvBuffer => {
             Logger.info('Received csv successfully');
-            //'pe10' cascades so only the last value is parsed
+            //'pe10' cascades so only the last value is parsed.
             return CSVParser(csvBuffer, { auto_parse: true, columns: ['date', 'close', 'dividend', 'earnings', 'cpi', 'gs10', 'pe10', 'pe10', 'pe10', 'pe10'] })
         }).then(dataArray => {
             Logger.info('Formatting data');
-            dataArray.shift(); //removes csv headers
+            dataArray.shift(); //Removes csv headers.
             dataArray.forEach((obj, index) => {
-                obj.dividend /= 12; //convert annualized dividends to monthly
-                Object.keys(obj).map(key => obj[key] = obj[key] || null); //convert '' => null
+                obj.dividend /= 12; //Convert annualized dividends to monthly
+                obj.gs10 = obj.gs10 > 100 ? null : obj.gs10; //Removes some junk data.
+                Object.keys(obj).map(key => obj[key] = obj[key] || null); //Convert '' to null.
 
                 if (index === 0 || !dataArray[index-1].dividend) {
                     obj.adjusted_close = obj.close;
