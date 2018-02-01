@@ -25,7 +25,7 @@ exports.up = function(Knex, Promise) {
               corr(a.return_20, b.percentage) AS return_20
             FROM analysis.sp_500_annualized_return a
             INNER JOIN usa.stock_asset_allocation b
-            ON (date_trunc('month', a.date + INTERVAL '1 day') = date_trunc('month', b.date))
+            ON (date_trunc('month', a.date) = date_trunc('month', b.date))
             AND a.return_1 > 0
             AND b.percentage > 0
         `);
