@@ -1,7 +1,8 @@
-
-exports.up = function(Knex, Promise) {
-    return Knex.schema.raw('CREATE SCHEMA analysis').then(function() {
-        return Knex.schema.raw(`
+exports.up = function(Knex) {
+  return Knex.schema
+    .raw('CREATE SCHEMA analysis')
+    .then(function() {
+      return Knex.schema.raw(`
             CREATE VIEW analysis.sp_500_annualized_return AS
             SELECT date,
             (((lead(adjusted_close, 12) OVER (ORDER BY date ASC) / adjusted_close) ^ 1) - 1)::REAL AS return_1,
@@ -13,8 +14,9 @@ exports.up = function(Knex, Promise) {
             (((lead(adjusted_close, 240) OVER (ORDER BY date ASC) / adjusted_close) ^ 0.05) - 1)::REAL AS return_20
             FROM usa.sp_500_monthly
         `);
-    }).then(function() {
-        return Knex.schema.raw(`
+    })
+    .then(function() {
+      return Knex.schema.raw(`
             CREATE VIEW analysis.usa_stock_allocation_vs_return_corr AS
             SELECT corr(a.return_1, b.percentage) AS return_1,
               corr(a.return_3, b.percentage) AS return_3,
@@ -32,6 +34,6 @@ exports.up = function(Knex, Promise) {
     });
 };
 
-exports.down = function(Knex, Promise) {
-    return Knex.schema.raw('DROP SCHEMA analysis CASCADE');
+exports.down = function(Knex) {
+  return Knex.schema.raw('DROP SCHEMA analysis CASCADE');
 };

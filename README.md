@@ -9,7 +9,7 @@ Using Node.js 4.2+, Postgres, and Knex.
 ### Usage:
 
 ```
-git clone https://github.com/robgraeber/financial-scraper.git && cd financial-scraper
+git clone https://github.com/effinggames/financial-scraper.git && cd financial-scraper
 npm install
 (setup env variables)
 npm start

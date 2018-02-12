@@ -1,35 +1,41 @@
-
-exports.up = function(Knex, Promise) {
-    return Knex.schema.raw('CREATE SCHEMA europe').then(function() {
-        return Knex.schema.withSchema('europe').createTable('total_liabilities', function (table) {
-            table.date('date').primary();
-            table.bigInteger('value');
-        });
-    }).then(function() {
-        return Knex.schema.withSchema('europe').createTable('total_market', function (table) {
-            table.date('date').primary();
-            table.bigInteger('value');
-        });
-    }).then(function() {
-        return Knex.schema.withSchema('europe').createTable('eafe_monthly', function (table) {
-            table.date('date').primary();
-            table.decimal('value', 9, 3);
-        });
-    }).then(function() {
-        return Knex.schema.withSchema('europe').createTable('eafe_daily', function (table) {
-            table.date('date').primary();
-            table.decimal('value', 9, 3);
-        });
-    }).then(function() {
-        return Knex.schema.raw(`
+exports.up = function(Knex) {
+  return Knex.schema
+    .raw('CREATE SCHEMA europe')
+    .then(function() {
+      return Knex.schema.withSchema('europe').createTable('total_liabilities', function(table) {
+        table.date('date').primary();
+        table.bigInteger('value');
+      });
+    })
+    .then(function() {
+      return Knex.schema.withSchema('europe').createTable('total_market', function(table) {
+        table.date('date').primary();
+        table.bigInteger('value');
+      });
+    })
+    .then(function() {
+      return Knex.schema.withSchema('europe').createTable('eafe_monthly', function(table) {
+        table.date('date').primary();
+        table.decimal('value', 9, 3);
+      });
+    })
+    .then(function() {
+      return Knex.schema.withSchema('europe').createTable('eafe_daily', function(table) {
+        table.date('date').primary();
+        table.decimal('value', 9, 3);
+      });
+    })
+    .then(function() {
+      return Knex.schema.raw(`
             CREATE VIEW europe.stock_asset_allocation AS
               SELECT a.date, (b.value::FLOAT / (b.value::FLOAT + a.value::FLOAT)) AS percentage
               FROM europe.total_liabilities a
               INNER JOIN europe.total_market b
               ON a.date = b.date
         `);
-    }).then(function() {
-        return Knex.schema.raw(`
+    })
+    .then(function() {
+      return Knex.schema.raw(`
             CREATE VIEW analysis.eafe_annualized_return AS
             SELECT date,
             (((lead(value, 12) OVER (ORDER BY date ASC) / value) ^ 1) - 1)::REAL AS return_1,
@@ -41,8 +47,9 @@ exports.up = function(Knex, Promise) {
             (((lead(value, 240) OVER (ORDER BY date ASC) / value) ^ 0.05) - 1)::REAL AS return_20
             FROM europe.eafe_monthly
         `);
-    }).then(function() {
-        return Knex.schema.raw(`
+    })
+    .then(function() {
+      return Knex.schema.raw(`
             CREATE VIEW analysis.europe_stock_allocation_vs_return_corr AS
             SELECT corr(a.return_1, b.percentage) AS return_1,
               corr(a.return_3, b.percentage) AS return_3,
@@ -60,6 +67,6 @@ exports.up = function(Knex, Promise) {
     });
 };
 
-exports.down = function(Knex, Promise) {
-    return Knex.schema.raw('DROP SCHEMA europe CASCADE');
+exports.down = function(Knex) {
+  return Knex.schema.raw('DROP SCHEMA europe CASCADE');
 };
