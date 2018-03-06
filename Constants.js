@@ -6,10 +6,16 @@ const getEnvVariable = function(name) {
   return value;
 };
 
+const getEnvVariableOptional = function(name) {
+  return process.env[name];
+};
+
 class Constants {
   constructor() {
-    //Mandatory constants
+    //Mandatory env variables
     this.PostgresConnectionString = getEnvVariable('DATABASE_URL');
+    //Optional env variables
+    this.QuandlApiKey = getEnvVariableOptional('QUANDL_API_KEY');
   }
 }
 

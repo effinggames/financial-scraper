@@ -2,6 +2,7 @@ const Logger = require('winston2'),
   Assert = require('assert'),
   Promise = require('bluebird'),
   Knex = require('../util/DatabaseHelper').knex,
+  Constants = require('../Constants'),
   CSVParser = Promise.promisify(require('csv-parse')),
   RequestLib = require('request-promise');
 
@@ -26,7 +27,11 @@ class SP500Scraper {
    */
   fetch() {
     Logger.info('Fetching sp500 index data (monthly)');
-    return Request.get(csvUrl)
+    return Request.get(csvUrl, {
+      qs: {
+        api_key: Constants.QuandlApiKey
+      }
+    })
       .then(csvBuffer => {
         Logger.info('Received csv successfully');
         //'pe10' cascades so only the last value is parsed.
