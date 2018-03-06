@@ -8,7 +8,7 @@
     "start": "knex migrate:latest && node Main.js fetch all"
   },
   "engines": {
-    "node": "4.2.x"
+    "node": "8.4.x"
   },
   "repository": {
     "type": "git",
