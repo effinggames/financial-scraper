@@ -2,7 +2,7 @@ const Assert = require('assert');
 
 const getEnvVariable = function(name) {
   const value = process.env[name];
-  Assert(value, `ENV variable: $name is not set!`);
+  Assert(value, `ENV variable: ${name} is not set!`);
   return value;
 };
 
