@@ -9,10 +9,10 @@ const Logger = require('winston2'),
 const Request = RequestLib.defaults({
   headers: {
     'User-Agent':
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36'
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
   },
   followAllRedirects: true,
-  jar: true
+  jar: true,
 });
 
 const lastYear = Math.floor(new Date().getTime() / 1000) - 31557600;
@@ -29,10 +29,10 @@ class SP500Scraper {
     Logger.info('Fetching sp500 index data (monthly)');
     return Request.get(csvUrl, {
       qs: {
-        api_key: Constants.QuandlApiKey
-      }
+        api_key: Constants.QuandlApiKey,
+      },
     })
-      .then(csvBuffer => {
+      .then((csvBuffer) => {
         Logger.info('Received csv successfully');
         //'pe10' cascades so only the last value is parsed.
         return CSVParser(csvBuffer, {
@@ -47,17 +47,17 @@ class SP500Scraper {
             'pe10',
             'pe10',
             'pe10',
-            'pe10'
-          ]
+            'pe10',
+          ],
         });
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Formatting data');
         dataArray.shift(); //Removes csv headers.
         dataArray.forEach((obj, index) => {
           obj.dividend /= 12; //Convert annualized dividends to monthly
           obj.gs10 = obj.gs10 > 100 ? null : obj.gs10; //Removes some junk data.
-          Object.keys(obj).map(key => (obj[key] = obj[key] || null)); //Convert '' to null.
+          Object.keys(obj).map((key) => (obj[key] = obj[key] || null)); //Convert '' to null.
 
           if (index === 0 || !dataArray[index - 1].dividend) {
             obj.adjusted_close = obj.close;
@@ -65,8 +65,7 @@ class SP500Scraper {
             const prevObj = dataArray[index - 1];
             obj.adjusted_close =
               prevObj.adjusted_close +
-              prevObj.adjusted_close *
-                (obj.close - prevObj.close - prevObj.dividend) /
+              (prevObj.adjusted_close * (obj.close - prevObj.close - prevObj.dividend)) /
                 prevObj.close;
           }
         });
@@ -74,15 +73,15 @@ class SP500Scraper {
 
         return dataArray;
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Truncating old sp500 data');
         return Promise.join(dataArray, Knex('usa.sp_500_monthly').truncate());
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info(`Inserting ${dataArray.length} rows`);
         return Promise.join(dataArray, Knex('usa.sp_500_monthly').insert(dataArray));
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info('All sp500 data should be saved');
         Logger.info(`Saved ${dataArray.length} rows`);
       });
@@ -90,40 +89,47 @@ class SP500Scraper {
   fetchDaily() {
     Logger.info('Fetching sp500 index data (daily)');
     //Calls yahoo url to get cookie + find the crumb.
-    return Request.get(yahooUrl).then(function(html) {
+    return Request.get(yahooUrl).then(function (html) {
       const crumbRegexp = /"CrumbStore":{"crumb":"(.+?)"}/;
       const matches = html.match(crumbRegexp);
       const crumb = matches[1].replace('\\u002F', '/');
       Assert(crumb, 'Yahoo crumb not found!');
 
       return Request.get(dailyCsvUrl + crumb)
-        .then(csvBuffer => {
+        .then((csvBuffer) => {
           Logger.info('Received csv successfully');
           //'pe10' cascades so only the last value is parsed
           return CSVParser(csvBuffer, {
             auto_parse: true,
-            columns: ['date', 'open', 'high', 'low', 'close', 'volume', 'adjClose']
+            columns: ['date', 'open', 'high', 'low', 'close', 'volume', 'adjClose'],
           });
         })
-        .then(dataArray => {
+        .then((dataArray) => {
           Logger.info('Formatting data');
           dataArray.shift(); //removes csv headers
           dataArray.reverse();
 
-          return dataArray.map(item => ({
-            date: item.date,
-            value: item.close
-          }));
+          return (
+            dataArray
+              .map((item) => ({
+                date: item.date,
+                value: item.close,
+              }))
+              // Removing duplicates
+              .filter(function (item, pos) {
+                return dataArray.findIndex((i) => i.date === item.date) == pos;
+              })
+          );
         })
-        .then(dataArray => {
+        .then((dataArray) => {
           Logger.info('Truncating old sp500 data');
           return Promise.join(dataArray, Knex('usa.sp_500_daily').truncate());
         })
-        .spread(dataArray => {
+        .spread((dataArray) => {
           Logger.info(`Inserting ${dataArray.length} rows`);
           return Promise.join(dataArray, Knex('usa.sp_500_daily').insert(dataArray));
         })
-        .spread(dataArray => {
+        .spread((dataArray) => {
           Logger.info('All sp500 data should be saved');
           Logger.info(`Saved ${dataArray.length} rows`);
         });

@@ -7,9 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "knex migrate:latest && node Main.js fetch all"
   },
-  "engines": {
-    "node": "8.4.x"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/robgraeber/financial-scraper.git"

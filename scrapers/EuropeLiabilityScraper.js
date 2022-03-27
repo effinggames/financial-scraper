@@ -16,18 +16,18 @@ class EuropeLiabilityScraper {
   fetch() {
     Logger.info('Fetching Europe liabilities (real economic borrowers) data');
     return Request.get(csvUrl)
-      .then(csvBuffer => {
+      .then((csvBuffer) => {
         Logger.info('Received csv successfully');
         //'pe10' cascades so only the last value is parsed
         return CSVParser(csvBuffer, {
           auto_parse: true,
-          columns: ['date', 'value']
+          columns: ['date', 'value'],
         });
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Formatting data');
-        dataArray = dataArray.slice(5);
-        dataArray = dataArray.map(obj => {
+        dataArray = dataArray.slice(6);
+        dataArray = dataArray.map((obj) => {
           obj.value = parseFloat(obj.value);
           const total = obj.value * 1000000;
           const yearStr = obj.date.slice(0, 4);
@@ -37,22 +37,22 @@ class EuropeLiabilityScraper {
 
           return {
             date: date.format('YYYY-MM-DD'),
-            value: parseInt(total)
+            value: parseInt(total),
           };
         });
         dataArray.reverse();
 
         return dataArray;
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Truncating old liability data');
         return Promise.join(dataArray, Knex('europe.total_liabilities').truncate());
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info(`Inserting ${dataArray.length} rows`);
         return Promise.join(dataArray, Knex('europe.total_liabilities').insert(dataArray));
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info('All liability data should be saved');
         Logger.info(`Saved ${dataArray.length} rows`);
       });

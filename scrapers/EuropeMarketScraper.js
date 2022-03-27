@@ -16,35 +16,35 @@ class EuropeMarketScraper {
   fetch() {
     Logger.info('Fetching Europe stock market (total value) data');
     return Request.get(csvUrl)
-      .then(csvBuffer => {
+      .then((csvBuffer) => {
         Logger.info('Received csv successfully');
         //'pe10' cascades so only the last value is parsed
         return CSVParser(csvBuffer, {auto_parse: true, columns: ['date', 'value']});
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Formatting data');
-        dataArray = dataArray.slice(5);
-        dataArray = dataArray.map(obj => {
+        dataArray = dataArray.slice(6);
+        dataArray = dataArray.map((obj) => {
           obj.value = parseFloat(obj.value);
           const date = Moment(new Date(obj.date)).tz('GMT');
           return {
             date: date.format('YYYY-MM-DD'),
-            value: parseInt(obj.value * 1000000)
+            value: parseInt(obj.value * 1000000),
           };
         });
         dataArray.reverse();
 
         return dataArray;
       })
-      .then(dataArray => {
+      .then((dataArray) => {
         Logger.info('Truncating old stock market data');
         return Promise.join(dataArray, Knex('europe.total_market').truncate());
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info(`Inserting ${dataArray.length} rows`);
         return Promise.join(dataArray, Knex('europe.total_market').insert(dataArray));
       })
-      .spread(dataArray => {
+      .spread((dataArray) => {
         Logger.info('All stock market data should be saved');
         Logger.info(`Saved ${dataArray.length} rows`);
       });
