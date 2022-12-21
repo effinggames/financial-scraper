@@ -17,7 +17,6 @@ const Request = RequestLib.defaults({
 
 const lastYear = Math.floor(new Date().getTime() / 1000) - 31557600;
 const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
-const yahooUrl = 'https://finance.yahoo.com/quote/%5ESP500TR/history?p=%5ESP500TR';
 const dailyCsvUrl = `https://query1.finance.yahoo.com/v7/finance/download/%5ESP500TR?period1=${lastYear}&period2=2500000000&interval=1d&events=history&crumb=`;
 
 class SP500Scraper {
@@ -88,52 +87,44 @@ class SP500Scraper {
   }
   fetchDaily() {
     Logger.info('Fetching sp500 index data (daily)');
-    //Calls yahoo url to get cookie + find the crumb.
-    return Request.get(yahooUrl).then(function (html) {
-      const crumbRegexp = /"CrumbStore":{"crumb":"(.+?)"}/;
-      const matches = html.match(crumbRegexp);
-      const crumb = matches[1].replace('\\u002F', '/');
-      Assert(crumb, 'Yahoo crumb not found!');
-
-      return Request.get(dailyCsvUrl + crumb)
-        .then((csvBuffer) => {
-          Logger.info('Received csv successfully');
-          //'pe10' cascades so only the last value is parsed
-          return CSVParser(csvBuffer, {
-            auto_parse: true,
-            columns: ['date', 'open', 'high', 'low', 'close', 'volume', 'adjClose'],
-          });
-        })
-        .then((dataArray) => {
-          Logger.info('Formatting data');
-          dataArray.shift(); //removes csv headers
-          dataArray.reverse();
-
-          return (
-            dataArray
-              .map((item) => ({
-                date: item.date,
-                value: item.close,
-              }))
-              // Removing duplicates
-              .filter(function (item, pos) {
-                return dataArray.findIndex((i) => i.date === item.date) == pos;
-              })
-          );
-        })
-        .then((dataArray) => {
-          Logger.info('Truncating old sp500 data');
-          return Promise.join(dataArray, Knex('usa.sp_500_daily').truncate());
-        })
-        .spread((dataArray) => {
-          Logger.info(`Inserting ${dataArray.length} rows`);
-          return Promise.join(dataArray, Knex('usa.sp_500_daily').insert(dataArray));
-        })
-        .spread((dataArray) => {
-          Logger.info('All sp500 data should be saved');
-          Logger.info(`Saved ${dataArray.length} rows`);
+    return Request.get(dailyCsvUrl)
+      .then((csvBuffer) => {
+        Logger.info('Received csv successfully');
+        //'pe10' cascades so only the last value is parsed
+        return CSVParser(csvBuffer, {
+          auto_parse: true,
+          columns: ['date', 'open', 'high', 'low', 'close', 'volume', 'adjClose'],
         });
-    });
+      })
+      .then((dataArray) => {
+        Logger.info('Formatting data');
+        dataArray.shift(); //removes csv headers
+        dataArray.reverse();
+
+        return (
+          dataArray
+            .map((item) => ({
+              date: item.date,
+              value: item.close,
+            }))
+            // Removing duplicates
+            .filter(function (item, pos) {
+              return dataArray.findIndex((i) => i.date === item.date) == pos;
+            })
+        );
+      })
+      .then((dataArray) => {
+        Logger.info('Truncating old sp500 data');
+        return Promise.join(dataArray, Knex('usa.sp_500_daily').truncate());
+      })
+      .spread((dataArray) => {
+        Logger.info(`Inserting ${dataArray.length} rows`);
+        return Promise.join(dataArray, Knex('usa.sp_500_daily').insert(dataArray));
+      })
+      .spread((dataArray) => {
+        Logger.info('All sp500 data should be saved');
+        Logger.info(`Saved ${dataArray.length} rows`);
+      });
   }
 }
 
