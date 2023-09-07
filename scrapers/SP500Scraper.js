@@ -4,7 +4,8 @@ const Logger = require('winston2'),
   Knex = require('../util/DatabaseHelper').knex,
   Constants = require('../Constants'),
   CSVParser = Promise.promisify(require('csv-parse')),
-  RequestLib = require('request-promise');
+  RequestLib = require('request-promise'),
+  XLSX = require('xlsx');
 
 const Request = RequestLib.defaults({
   headers: {
@@ -16,7 +17,7 @@ const Request = RequestLib.defaults({
 });
 
 const lastYear = Math.floor(new Date().getTime() / 1000) - 31557600;
-const csvUrl = 'https://www.quandl.com/api/v1/datasets/YALE/SPCOMP.csv';
+const xlsUrl = 'http://www.econ.yale.edu/~shiller/data/ie_data.xls';
 const dailyCsvUrl = `https://query1.finance.yahoo.com/v7/finance/download/%5ESP500TR?period1=${lastYear}&period2=2500000000&interval=1d&events=history&crumb=`;
 
 class SP500Scraper {
@@ -26,38 +27,78 @@ class SP500Scraper {
    */
   fetch() {
     Logger.info('Fetching sp500 index data (monthly)');
-    return Request.get(csvUrl, {
-      qs: {
-        api_key: Constants.QuandlApiKey,
-      },
-    })
-      .then((csvBuffer) => {
-        Logger.info('Received csv successfully');
-        //'pe10' cascades so only the last value is parsed.
-        return CSVParser(csvBuffer, {
-          auto_parse: true,
-          columns: [
+    return Request.get({url: xlsUrl, encoding: null})
+      .then((xlsBuffer) => {
+        Logger.info('Received XLS successfully');
+
+        const workbook = XLSX.read(xlsBuffer);
+        const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[4]], {
+          range: 'A9:M9999',
+          header: [
             'date',
             'close',
             'dividend',
             'earnings',
             'cpi',
+            'dateFraction',
             'gs10',
-            'pe10',
-            'pe10',
-            'pe10',
+            'adjusted_close',
+            'realDividend',
+            'tr',
+            'earnings',
+            'trEarnings',
             'pe10',
           ],
         });
+
+        const formattedData = data.filter((obj) => obj.date != null);
+
+        formattedData.forEach((obj) => {
+          const [year, month] = obj.date.split('.');
+          obj.date = new Date(parseFloat(year), (month === '1' ? 10 : parseFloat(month)) - 1);
+
+          Object.keys(obj).forEach((key) => {
+            if (
+              ![
+                'date',
+                'close',
+                'dividend',
+                'earnings',
+                'cpi',
+                'gs10',
+                'adjusted_close',
+                'dividend',
+                'pe10',
+              ].includes(key)
+            ) {
+              delete obj[key];
+            }
+
+            if (typeof obj[key] === 'string') {
+              obj[key] = parseFloat(obj[key]);
+            }
+          });
+        });
+        return formattedData;
       })
       .then((dataArray) => {
         Logger.info('Formatting data');
-        dataArray.shift(); //Removes csv headers.
         dataArray.forEach((obj, index) => {
           obj.dividend /= 12; //Convert annualized dividends to monthly
           obj.gs10 = obj.gs10 > 100 ? null : obj.gs10; //Removes some junk data.
-          Object.keys(obj).map((key) => (obj[key] = obj[key] || null)); //Convert '' to null.
+        });
 
+        dataArray.reverse();
+
+        dataArray.forEach((obj, index) => {
+          Object.keys(obj).forEach((key) => {
+            if (key !== 'date') {
+              obj[key] = Math.round(obj[key] * 100) / 100;
+            }
+          });
+        });
+
+        dataArray.forEach((obj, index) => {
           if (index === 0 || !dataArray[index - 1].dividend) {
             obj.adjusted_close = obj.close;
           } else {
@@ -68,7 +109,6 @@ class SP500Scraper {
                 prevObj.close;
           }
         });
-        dataArray.reverse();
 
         return dataArray;
       })

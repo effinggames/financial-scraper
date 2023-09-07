@@ -27,6 +27,6 @@
     "pg": "^8.7.3",
     "request-promise": "^0.4.3",
     "winston2": "^1.0.3",
-    "xlsx": "https://github.com/robgraeber/js-xlsx"
+    "xlsx": "github:robgraeber/js-xlsx"
   }
 }
